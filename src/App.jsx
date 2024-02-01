@@ -7,6 +7,7 @@ import SignIn from './pages/SignIn';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import CompleteForm from './pages/CompleteForm';
+import ForgotPassword from './pages/ForgetPassword';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path='/Login' element={<Login/>} />
           <Route path='/Home' element={<Home/>} />
           <Route path='/Home/complete' element={<CompleteForm/>} />
+          <Route path='/Forget' element={<ForgotPassword/>} />
           {/* Add more routes as needed */}
         </Routes>
       </div>

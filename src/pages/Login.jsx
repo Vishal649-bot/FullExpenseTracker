@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Link,useNavigate } from 'react-router-dom';
 import '../components/Login/Login.css';
+import ForgotPassword from './ForgetPassword';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -69,6 +70,7 @@ function Login() {
         </div>
         <button type="submit">Login</button>
         <p>Don't have an account? <Link to="/">Sign Up</Link></p>
+        <button><Link to='/Forget'>Forget Password</Link></button>
       </form>
     </div>
   );

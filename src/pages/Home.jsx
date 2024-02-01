@@ -11,6 +11,7 @@ const Home = () => {
     <div className='container'>
       <div>Winner never qite, Quitter Never win</div>
       <button onClick={deleteToken} ><Link to='/Login'> LogOut</Link> </button>
+      <button><Link to='/Expense'>Expense</Link> </button>
       <div>
     {/* your profile is {(data.data ? <span>complete</span>:<div><span>incomplete</span> <button> <Link to='/Home/Complete'>Complete Now</Link></button></div> 
     )} */}

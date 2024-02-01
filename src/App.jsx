@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import CompleteForm from './pages/CompleteForm';
 import ForgotPassword from './pages/ForgetPassword';
+import ExpenseTracker from './pages/ExpenseTracker';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path='/Home' element={<Home/>} />
           <Route path='/Home/complete' element={<CompleteForm/>} />
           <Route path='/Forget' element={<ForgotPassword/>} />
+          <Route path='/Expense' element={<ExpenseTracker/>} />
           {/* Add more routes as needed */}
         </Routes>
       </div>

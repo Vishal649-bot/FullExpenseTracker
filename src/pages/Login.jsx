@@ -30,6 +30,19 @@ function Login() {
     const data = await response.json()
     console.log(data);
     localStorage.setItem('token', data.idToken )
+    
+    const emailvarifi = await  fetch("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCjPHPbwO6y6-tia4sWzTa4IoVfCK544O8", {
+        method: "POST",
+        body: JSON.stringify({
+            requestType: "VERIFY_EMAIL",
+            idToken: data.idToken
+        }),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    const varifi =await emailvarifi.json()
+    console.log(varifi);
   };
 
   return (

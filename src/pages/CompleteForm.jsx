@@ -1,15 +1,39 @@
-import  { useState } from 'react';
+import  { useState,useEffect } from 'react';
 import Home from './Home';
 import '../components/CompleteForm/CompleteForm.css'
 function CompleteForm() {
   const [fullName, setFullName] = useState('');
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
+//   const [Data, setData] = useState(true)
+const token = localStorage.getItem('token')
+    useEffect(() => {
+        const fetchdata = async()=>{
+            const respone = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCjPHPbwO6y6-tia4sWzTa4IoVfCK544O8",{
+                method: "POST",
+                body: JSON.stringify({
+                    idToken: token,
+                   
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            const data = await respone.json();
+            console.log(data);
+            setFullName(data.users[0].displayName);
+            setProfilePhotoUrl(data.users[0].photoUrl)
+            
+    }
+
+    fetchdata()
+    }, [])
+    
 
   const handleUpdate = async(e) => {
     e.preventDefault();
     // Handle update logic
     const token = localStorage.getItem('token')
-    // console.log(token);
+    console.log(token);
     const response = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:update?key= AIzaSyCjPHPbwO6y6-tia4sWzTa4IoVfCK544O8", {
         method: "POST",
         body: JSON.stringify({
@@ -23,7 +47,8 @@ function CompleteForm() {
         },
     })
     const data = await response.json()
-    console.log(data);
+   console.log(data);
+    
   };
 
   return (

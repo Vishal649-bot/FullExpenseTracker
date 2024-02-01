@@ -1,12 +1,13 @@
 // Login.js
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import '../components/Login/Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,7 +23,13 @@ function Login() {
             "Content-Type": "application/json",
         },
     })
-    console.log(response);
+    
+    if(response.ok){
+        navigate('/Home')
+    }
+    const data = await response.json()
+    console.log(data);
+    localStorage.setItem('token', data.idToken )
   };
 
   return (
@@ -55,3 +62,4 @@ function Login() {
 }
 
 export default Login;
+//akum599@gmail.com

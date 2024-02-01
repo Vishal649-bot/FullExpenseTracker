@@ -1,6 +1,7 @@
-// SignupForm.js
+// SignIn.js
 
 import  { useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../components/SignIn/SignIn.css';
 
 function SignIn() {
@@ -8,20 +9,31 @@ function SignIn() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSignup = (e) => {
+  const handleSignup = async(e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert("Passwords don't match");
       return;
     }
     // Handle signup logic
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Confirm Password:', confirmPassword);
+    const response = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=YOUR_API_KEY",
+    {
+        method: "POST",
+        body: JSON.stringify({
+            email: email,
+            password: password,
+            returnSecureToken: true,
+        }),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    const data = await response.json();
+    // console.log(data);
   };
 
   return (
-    <div className="SignupForm">
+    <div className="SignInForm">
       <h2>Sign Up</h2>
       <form onSubmit={handleSignup}>
         <div className="form-group">
@@ -52,6 +64,7 @@ function SignIn() {
           />
         </div>
         <button type="submit">Sign Up</button>
+        <p>Already have an account? <Link to="/login">Login</Link></p>
       </form>
     </div>
   );

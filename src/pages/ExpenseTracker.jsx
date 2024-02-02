@@ -1,30 +1,31 @@
-import  { useState,useEffect } from 'react';
-import '../components/Expense/Expense.css'
-import axios from 'axios'
+import  { useState, useEffect } from 'react';
+import '../components/Expense/Expense.css';
+import axios from 'axios';
+
 function ExpenseTracker() {
   const [moneySpent, setMoneySpent] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [expenses, setExpenses] = useState([]);
+  const [editId, setEditId] = useState(null);
 
   useEffect(() => {
-    const fetchdata = async ()=>{
-        const response = await axios.get("https://full-expensetracker-default-rtdb.firebaseio.com/expense.json")
-       
-        // setExpenses(response.data)
-        const fetchedExpenses = Object.keys(response.data).map(key => ({
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("https://full-expensetracker-default-rtdb.firebaseio.com/expense.json");
+        if (response.data) {
+          const fetchedExpenses = Object.keys(response.data).map(key => ({
             id: key,
             ...response.data[key]
           }));
-          console.log('====================================');
-          console.log(fetchedExpenses);
-          console.log('====================================');
-          setExpenses(fetchedExpenses)
-    }
-
-    fetchdata()
-  }, [])
-  
+          setExpenses(fetchedExpenses);
+        }
+      } catch (error) {
+        console.error('Error fetching expenses:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleAddExpense = async (e) => {
     e.preventDefault();
@@ -33,20 +34,64 @@ function ExpenseTracker() {
       description: description,
       category: category
     };
-    // Update expenses array with new expense
-    const response = await axios.post("https://full-expensetracker-default-rtdb.firebaseio.com/expense.json", newExpense)
-    // console.log(response);
-    setExpenses([...expenses, newExpense]);
-    // Clear form fields after adding expense
-    setMoneySpent('');
-    setDescription('');
-    setCategory('');
+    try {
+      const response = await axios.post("https://full-expensetracker-default-rtdb.firebaseio.com/expense.json", newExpense);
+      setExpenses([...expenses, { id: response.data.name, ...newExpense }]);
+      setMoneySpent('');
+      setDescription('');
+      setCategory('');
+    } catch (error) {
+      console.error('Error adding expense:', error);
+    }
+  };
+
+  const handleDeleteExpense = async (id) => {
+    try {
+      await axios.delete(`https://full-expensetracker-default-rtdb.firebaseio.com/expense/${id}.json`);
+      setExpenses(expenses.filter(expense => expense.id !== id));
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
+  };
+
+
+
+  const handleEditExpense = (expense) => {
+    
+    setEditId(expense.id);
+    setCategory(expense.category);
+    setDescription(expense.description);
+    setMoneySpent(expense.moneySpent);
+  };
+
+  const handleUpdateExpense = async (e) => {
+    e.preventDefault()
+    const updatedExpense = {
+      category: category,
+      description: description,
+      moneySpent: moneySpent,
+    };
+    console.log('baby');
+    
+     const res =  await axios.put(`https://full-expensetracker-default-rtdb.firebaseio.com/expense/${editId}.json`, updatedExpense);
+     console.log('====================================');
+     console.log(res);
+     console.log('====================================');
+      // const updatedExpenses = expenses.map(expense =>
+      //   expense.id === editId ? { ...expense, ...updatedExpense } : expense
+      // );
+      // setExpenses(updatedExpenses);
+      setMoneySpent('');
+      setDescription('');
+      setCategory('');
+      setEditId(null);
+    
   };
 
   return (
     <div className="ExpenseForm">
       <h2>Add Daily Expense</h2>
-      <form onSubmit={handleAddExpense}>
+      <form onSubmit={editId ? handleUpdateExpense : handleAddExpense}>
         <div className="form-group">
           <label htmlFor="moneySpent">Money Spent:</label>
           <input
@@ -82,17 +127,19 @@ function ExpenseTracker() {
             {/* Add more options as needed */}
           </select>
         </div>
-        <button type="submit">Add Expense</button>
+        <button type="submit">{editId ? 'Update Expense' : 'Add Expense'}</button>
       </form>
 
       <div className="ExpenseList">
         <h2>Expenses</h2>
         <ul>
-          {expenses.map((expense, index) => (
-            <li key={index}>
+          {expenses.map((expense) => (
+            <li key={expense.id}>
               <strong>Money Spent:</strong> {expense.moneySpent},{' '}
               <strong>Description:</strong> {expense.description},{' '}
               <strong>Category:</strong> {expense.category}
+              <button onClick={() => handleEditExpense(expense)}>Edit</button>
+              <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
             </li>
           ))}
         </ul>

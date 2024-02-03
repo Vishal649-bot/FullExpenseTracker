@@ -45,4 +45,30 @@
   button:hover {
     background-color: #0056b3;
   }
+  .dark-theme {
+    background-color: #222;
+    color: #fff;
+  }
   
+  .light-theme {
+    background-color: #fff;
+    color: #222;
+  }
+
+  .dark-ExpenseForm {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #000000;
+  }
+  .dark-ExpenseForm  h2{
+    color: white;
+  }
+  .dark-ExpenseForm form label{
+    color: white;
+  }
+  .dark-ExpenseForm ul{
+    color: #eff0f0;
+  }

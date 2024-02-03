@@ -3,17 +3,35 @@ import '../components/Expense/Expense.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { setExpenses, addExpense } from '../../store/Expensereducers';
 import axios from 'axios';
+import { toggleTheme } from '../../store/themeSlice';
+import { CSVLink } from 'react-csv';
+
 
 function ExpenseTracker() {
   const [moneySpent, setMoneySpent] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [editId, setEditId] = useState(null);
+  const [activatelink, setActivatelink] = useState(false)
+
+  const activte =()=>{
+    setActivatelink(prev => !prev)
+  }
 
   const dispatch = useDispatch();
   const expenses = useSelector(state => state.expenses.expenses);
   const showPremiumButton = useSelector(state => state.expenses.showPremiumButton);
+  const isDarkTheme = useSelector(state => state.theme.isDarkTheme);
 
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
+  };
+
+  const csvData = expenses.map(expense => ({
+    MoneySpent: expense.moneySpent,
+    Description: expense.description,
+    Category: expense.category
+  }));
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,7 +107,8 @@ function ExpenseTracker() {
   };
 
   return (
-    <div className="ExpenseForm">
+    
+    <div className={isDarkTheme?'dark-ExpenseForm': 'ExpenseForm'}>
       <h2>Add Daily Expense</h2>
       <form onSubmit={editId ? handleUpdateExpense : handleAddExpense}>
         <div className="form-group">
@@ -129,7 +148,7 @@ function ExpenseTracker() {
         </div>
         <button type="submit">{editId ? 'Update Expense' : 'Add Expense'}</button>
       </form>
-
+     
       <div className="ExpenseList">
         <h2>Expenses</h2>
         <ul>
@@ -146,9 +165,19 @@ function ExpenseTracker() {
       </div>
 
       {showPremiumButton && (
-        <button>Activate Premium</button>
+        <button onClick={activte}>Activate Premium</button>
       )}
+      {activatelink && (
+        <div>
+        <CSVLink data={csvData} filename={"expenses.csv"}>Download Expenses</CSVLink>  <button onClick={handleToggleTheme}>Toggle Theme</button>
+        </div>
+        )
+        
+        }
     </div>
+
+    
+    
   );
 }
 

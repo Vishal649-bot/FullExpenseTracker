@@ -1,14 +1,16 @@
 // Login.js
-
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../store/Auth';
 import { useState } from 'react';
 import { Link,useNavigate } from 'react-router-dom';
 import '../components/Login/Login.css';
-import ForgotPassword from './ForgetPassword';
+// import ForgotPassword from './ForgetPassword';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,13 +26,17 @@ function Login() {
             "Content-Type": "application/json",
         },
     })
-    
+
+    console.log('kkk');
     if(response.ok){
-        navigate('/Home')
+      
+      navigate('/Home');
     }
-    const data = await response.json()
-    console.log(data);
-    localStorage.setItem('token', data.idToken )
+    // const data = await response.json()
+    const data = await response.json();
+      dispatch(loginSuccess({ userId: data.localId, bearerToken: data.idToken }));
+      localStorage.setItem('token', data.idToken );
+    
     
     const emailvarifi = await  fetch("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCjPHPbwO6y6-tia4sWzTa4IoVfCK544O8", {
         method: "POST",
@@ -69,7 +75,7 @@ function Login() {
           />
         </div>
         <button type="submit">Login</button>
-        <p>Don't have an account? <Link to="/">Sign Up</Link></p>
+        <p>Dont have an account? <Link to="/">Sign Up</Link></p>
         <button><Link to='/Forget'>Forget Password</Link></button>
       </form>
     </div>

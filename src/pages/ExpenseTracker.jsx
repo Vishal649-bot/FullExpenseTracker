@@ -1,13 +1,18 @@
 import  { useState, useEffect } from 'react';
 import '../components/Expense/Expense.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { setExpenses, addExpense } from '../../store/Expensereducers';
 import axios from 'axios';
 
 function ExpenseTracker() {
   const [moneySpent, setMoneySpent] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [expenses, setExpenses] = useState([]);
   const [editId, setEditId] = useState(null);
+
+  const dispatch = useDispatch();
+  const expenses = useSelector(state => state.expenses.expenses);
+  const showPremiumButton = useSelector(state => state.expenses.showPremiumButton);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,14 +23,14 @@ function ExpenseTracker() {
             id: key,
             ...response.data[key]
           }));
-          setExpenses(fetchedExpenses);
+          dispatch(setExpenses(fetchedExpenses));
         }
       } catch (error) {
         console.error('Error fetching expenses:', error);
       }
     };
     fetchData();
-  }, []);
+  }, [dispatch]);
 
   const handleAddExpense = async (e) => {
     e.preventDefault();
@@ -36,7 +41,7 @@ function ExpenseTracker() {
     };
     try {
       const response = await axios.post("https://full-expensetracker-default-rtdb.firebaseio.com/expense.json", newExpense);
-      setExpenses([...expenses, { id: response.data.name, ...newExpense }]);
+      dispatch(addExpense({ id: response.data.name, ...newExpense }));
       setMoneySpent('');
       setDescription('');
       setCategory('');
@@ -48,16 +53,15 @@ function ExpenseTracker() {
   const handleDeleteExpense = async (id) => {
     try {
       await axios.delete(`https://full-expensetracker-default-rtdb.firebaseio.com/expense/${id}.json`);
-      setExpenses(expenses.filter(expense => expense.id !== id));
+      // dispatch delete action here if needed
+      dispatch(setExpenses(expenses.filter(expense => expense.id !== id)));
+
     } catch (error) {
       console.error('Error deleting expense:', error);
     }
   };
 
-
-
   const handleEditExpense = (expense) => {
-    
     setEditId(expense.id);
     setCategory(expense.category);
     setDescription(expense.description);
@@ -65,27 +69,23 @@ function ExpenseTracker() {
   };
 
   const handleUpdateExpense = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const updatedExpense = {
       category: category,
       description: description,
       moneySpent: moneySpent,
     };
-    console.log('baby');
-    
-     const res =  await axios.put(`https://full-expensetracker-default-rtdb.firebaseio.com/expense/${editId}.json`, updatedExpense);
-     console.log('====================================');
-     console.log(res);
-     console.log('====================================');
-      // const updatedExpenses = expenses.map(expense =>
-      //   expense.id === editId ? { ...expense, ...updatedExpense } : expense
-      // );
-      // setExpenses(updatedExpenses);
+
+    try {
+      await axios.put(`https://full-expensetracker-default-rtdb.firebaseio.com/expense/${editId}.json`, updatedExpense);
+      // dispatch update action here if needed
       setMoneySpent('');
       setDescription('');
       setCategory('');
       setEditId(null);
-    
+    } catch (error) {
+      console.error('Error updating expense:', error);
+    }
   };
 
   return (
@@ -144,6 +144,10 @@ function ExpenseTracker() {
           ))}
         </ul>
       </div>
+
+      {showPremiumButton && (
+        <button>Activate Premium</button>
+      )}
     </div>
   );
 }
